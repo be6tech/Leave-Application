@@ -141,8 +141,7 @@ body{background:#f0f4f8;font-family:var(--font-sans);color:var(--color-text-prim
         <option>BE19990022</option><option>BE19990023</option><option>BE19990024</option>
         <option>BE19990025</option><option>BE19990026</option><option>BE19990027</option>
         <option>BE19990028</option><option>BE19990029</option><option>BE19990030</option>
-        <option>BE19990031</option><option>BE19990033</option><option>BE19990034</option>
-        
+        <option>BE19990031</option><option>BE19990033</option>
       </select>
       <div class="emp-info" id="empInfo">
         <div class="emp-avatar" id="empAvatar"></div>
@@ -162,7 +161,7 @@ body{background:#f0f4f8;font-family:var(--font-sans);color:var(--color-text-prim
       <button class="lt-btn" onclick="selectLeave(this,'Sick Leave')"><span class="lt-dot" style="background:#d85a30"></span>Sick Leave</button>
       <button class="lt-btn" onclick="selectLeave(this,'Earned Leave')"><span class="lt-dot" style="background:#1d9e75"></span>Earned Leave</button>
       <button class="lt-btn" onclick="selectLeave(this,'Emergency Leave')"><span class="lt-dot" style="background:#ba7517"></span>Emergency Leave</button>
-      <button class="lt-btn" onclick="selectLeave(this,'Half Day Leave')"><span class="lt-dot" style="background:#d4537e"></span>Half Day Leave</button>
+      <button class="lt-btn" onclick="selectLeave(this,'Maternity / Paternity')"><span class="lt-dot" style="background:#d4537e"></span>Maternity / Paternity</button>
       <button class="lt-btn" onclick="selectLeave(this,'Unpaid Leave')"><span class="lt-dot" style="background:#888780"></span>Unpaid Leave</button>
     </div>
     <input type="hidden" id="leaveType" value="Casual Leave">
@@ -220,6 +219,7 @@ body{background:#f0f4f8;font-family:var(--font-sans);color:var(--color-text-prim
         </div>
       </div>
       <div style="text-align:center;margin-top:1rem;font-size:12px;color:var(--color-text-secondary)">
+        Default credentials: <strong>admin</strong> / <strong>sivatatva@2024</strong>
       </div>
     </div>
   </div>
@@ -312,21 +312,21 @@ const employees={
   "BE19990026":"sreelakshmi0107@gmail.com","BE19990027":"kothanagaraju96@gmail.com",
   "BE19990028":"sreekanthp98614@gmail.com","BE19990029":"srikanthch2025@gmail.com",
   "BE19990030":"ndrnimmagadda@gmail.com","BE19990031":"lavanyabypureddy61@gmail.com",
-  "BE19990033":"dileepkumarg557@gmail.com","BE19990034":"Kokkiralabharagavi@gmail.com"
+  "BE19990033":"dileepkumarg557@gmail.com"
 };
 
 let applications=[];
 let currentFilter='all';
 let scriptUrl='https://script.google.com/macros/s/AKfycbzcEo2XEU32o1Rczg7msk5cirHrN6_JAa9wH5filOTe-xSMJ58XKSKTIZ_AHgsz7rxb/exec';
 let isLoggedIn=false;
-let adminCreds={username:'admin',password:'Admin@123'};
+let adminCreds={username:'admin',password:'sivatatva@2024'};
 let pendingDecision={appId:null,status:null};
 
 // ── Page Navigation ───────────────────────────────────────────
 function showPage(id){
   document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
   document.getElementById(id).classList.add('active');
-  if(id==='pageAdmin')renderApps();
+  if(id==='pageAdmin')loadApplicationsFromSheet();
 }
 function goToAdmin(){
   if(isLoggedIn){showPage('pageAdmin');}
@@ -453,7 +453,7 @@ async function submitForm(){
   }
 
   applications.unshift(app);
-  btn.disabled=false;btn.innerHTML='Submit application'; 
+  btn.disabled=false;btn.innerHTML='Submit application';
   resetForm();
 }
 
@@ -505,11 +505,49 @@ async function confirmDecide(){
     }
   }catch(err){
     showToast(status+' saved locally — sync failed','error');
+    renderApps();
+    return;
   }
-  renderApps();
+  // Reload fresh from sheet so all devices see updated status
+  await loadApplicationsFromSheet();
 }
 
 // ── Filter & Render ───────────────────────────────────────────
+// ── Load from Sheet ──────────────────────────────────────────
+async function loadApplicationsFromSheet(){
+  const list=document.getElementById('appList');
+  list.innerHTML='<div class="empty-state"><span class="spinner" style="border-top-color:#1a3a5c;border-color:rgba(26,58,92,0.2)"></span> Loading applications…</div>';
+  try{
+    const payload=encodeURIComponent(JSON.stringify({action:'getAll'}));
+    const res=await fetch(scriptUrl+'?payload='+payload);
+    const result=await res.json();
+    if(result.success && Array.isArray(result.data)){
+      // Map sheet rows back to app objects
+      applications=result.data.map(row=>({
+        appId:     row[0]||'',
+        empId:     row[1]||'',
+        empEmail:  row[2]||'',
+        leaveType: row[3]||'',
+        from:      row[4]||'',
+        to:        row[5]||'',
+        days:      row[6]||0,
+        reason:    row[7]||'',
+        handover:  row[8]||'—',
+        managerName:  row[9]||'',
+        managerEmail: row[10]||'',
+        status:    row[11]||'Pending',
+        submittedAt:  row[12]||'',
+        remarks:   row[13]||''
+      }));
+      renderApps();
+    }else{
+      list.innerHTML='<div class="empty-state">Could not load data: '+(result.error||'unknown error')+'</div>';
+    }
+  }catch(err){
+    list.innerHTML='<div class="empty-state">Failed to connect to sheet. Check your network.</div>';
+  }
+}
+
 function filterApps(filter,tab){
   currentFilter=filter;
   document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
