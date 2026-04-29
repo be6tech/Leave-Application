@@ -1,0 +1,572 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SIVATATVA Solutions — Leave Management</title>
+<style>
+:root{
+  --color-text-primary:#1a1a1a;
+  --color-text-secondary:#6b7280;
+  --color-background-primary:#ffffff;
+  --color-background-secondary:#f8f9fa;
+  --color-border-secondary:#d1d5db;
+  --color-border-tertiary:#e5e7eb;
+  --border-radius-md:8px;
+  --border-radius-lg:12px;
+  --font-sans:'Segoe UI',system-ui,-apple-system,sans-serif;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:#f0f4f8;font-family:var(--font-sans);color:var(--color-text-primary)}
+.sr-only{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0,0,0,0)}
+.wrap{padding:1.5rem 1rem;max-width:700px;margin:0 auto;position:relative}
+.page{display:none}.page.active{display:block}
+.header{display:flex;align-items:center;gap:14px;margin-bottom:1.5rem;padding-bottom:1rem;border-bottom:1px solid var(--color-border-tertiary)}
+.logo{width:42px;height:42px;border-radius:10px;background:#1a3a5c;display:flex;align-items:center;justify-content:center;flex-shrink:0;box-shadow:0 2px 8px rgba(26,58,92,0.25)}
+.logo svg{width:24px;height:24px}
+.company{font-size:11px;color:var(--color-text-secondary);margin-top:1px;letter-spacing:0.06em;text-transform:uppercase}
+.page-title{font-size:17px;font-weight:600;color:var(--color-text-primary)}
+.card{background:#fff;border:1px solid var(--color-border-tertiary);border-radius:var(--border-radius-lg);padding:1.25rem 1.5rem;margin-bottom:1rem;box-shadow:0 1px 4px rgba(0,0,0,0.04)}
+.section-label{font-size:11px;font-weight:600;letter-spacing:0.07em;text-transform:uppercase;color:var(--color-text-secondary);margin-bottom:12px}
+.field{margin-bottom:13px}
+.field label{display:block;font-size:13px;color:var(--color-text-secondary);margin-bottom:4px;font-weight:500}
+.field input,.field select,.field textarea{width:100%;padding:9px 11px;font-size:14px;border:1px solid var(--color-border-secondary);border-radius:var(--border-radius-md);background:var(--color-background-primary);color:var(--color-text-primary);font-family:var(--font-sans);transition:border-color 0.15s,box-shadow 0.15s}
+.field textarea{resize:vertical;min-height:72px}
+.field input:focus,.field select:focus,.field textarea:focus{outline:none;border-color:#1a3a5c;box-shadow:0 0 0 3px rgba(26,58,92,0.1)}
+.row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.lt-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.lt-btn{padding:9px 11px;border:1px solid var(--color-border-secondary);border-radius:var(--border-radius-md);font-size:13px;cursor:pointer;background:#fff;color:var(--color-text-primary);text-align:left;display:flex;align-items:center;gap:8px;transition:all 0.15s;font-family:var(--font-sans)}
+.lt-btn:hover{background:#f8f9fa;border-color:#adb5bd}
+.lt-btn.active{background:#e8f0f8;border-color:#1a3a5c;color:#1a3a5c;font-weight:500}
+.lt-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+.days-badge{background:var(--color-background-secondary);border:1px solid var(--color-border-tertiary);border-radius:var(--border-radius-md);padding:12px 16px;display:flex;justify-content:space-between;align-items:center;margin-top:8px}
+.days-num{font-size:22px;font-weight:600;color:#1a3a5c}
+.days-lbl{font-size:12px;color:var(--color-text-secondary)}
+.btn-primary{padding:11px 22px;background:#1a3a5c;color:#fff;border:none;border-radius:var(--border-radius-md);font-size:14px;font-weight:500;cursor:pointer;font-family:var(--font-sans);transition:all 0.15s;box-shadow:0 2px 6px rgba(26,58,92,0.25)}
+.btn-primary:hover{background:#15304e;box-shadow:0 4px 12px rgba(26,58,92,0.3)}
+.btn-primary:disabled{opacity:0.5;cursor:default;box-shadow:none}
+.btn-outline{padding:9px 18px;background:#fff;color:var(--color-text-primary);border:1px solid var(--color-border-secondary);border-radius:var(--border-radius-md);font-size:13px;cursor:pointer;font-family:var(--font-sans);transition:all 0.15s}
+.btn-outline:hover{background:var(--color-background-secondary)}
+.req{color:#e24b4a}
+.emp-info{display:none;align-items:center;gap:10px;padding:9px 11px;background:var(--color-background-secondary);border-radius:var(--border-radius-md);margin-top:6px;border:1px solid var(--color-border-tertiary)}
+.emp-avatar{width:32px;height:32px;border-radius:50%;background:#1a3a5c;color:#fff;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:600;flex-shrink:0}
+.emp-email-txt{font-size:13px;color:var(--color-text-secondary)}
+.badge{display:inline-block;padding:3px 9px;border-radius:99px;font-size:11px;font-weight:600}
+.badge-pending{background:#fef3c7;color:#92400e}
+.badge-approved{background:#d1fae5;color:#065f46}
+.badge-rejected{background:#fee2e2;color:#991b1b}
+.app-row{border-bottom:1px solid var(--color-border-tertiary);padding:13px 0;display:grid;grid-template-columns:1fr auto;gap:12px;align-items:start}
+.app-row:last-child{border-bottom:none}
+.app-id{font-size:13px;font-weight:600}
+.app-meta{font-size:12px;color:var(--color-text-secondary);margin-top:3px;line-height:1.5}
+.btn-approve{padding:6px 13px;background:#d1fae5;color:#065f46;border:1px solid #6ee7b7;border-radius:var(--border-radius-md);font-size:12px;cursor:pointer;font-family:var(--font-sans);font-weight:500;transition:background 0.15s}
+.btn-approve:hover{background:#a7f3d0}
+.btn-reject{padding:6px 13px;background:#fee2e2;color:#991b1b;border:1px solid #fca5a5;border-radius:var(--border-radius-md);font-size:12px;cursor:pointer;font-family:var(--font-sans);font-weight:500;transition:background 0.15s}
+.btn-reject:hover{background:#fecaca}
+.tabs{display:flex;border-bottom:1px solid var(--color-border-tertiary);margin-bottom:1rem}
+.tab{padding:9px 18px;font-size:13px;cursor:pointer;color:var(--color-text-secondary);border-bottom:2px solid transparent;background:none;border-top:none;border-left:none;border-right:none;font-family:var(--font-sans);transition:color 0.15s}
+.tab.active{color:#1a3a5c;border-bottom-color:#1a3a5c;font-weight:600}
+.empty-state{text-align:center;padding:2.5rem;color:var(--color-text-secondary);font-size:13px}
+.toast{position:fixed;bottom:1.5rem;left:50%;transform:translateX(-50%);padding:11px 22px;border-radius:10px;font-size:13px;display:none;z-index:9999;white-space:nowrap;max-width:90%;box-shadow:0 4px 16px rgba(0,0,0,0.15)}
+.toast.success{background:#1a3a5c;color:#fff}
+.toast.error{background:#991b1b;color:#fff}
+.toast.info{background:#374151;color:#fff}
+.spinner{display:inline-block;width:14px;height:14px;border:2px solid rgba(255,255,255,0.4);border-top-color:#fff;border-radius:50%;animation:spin 0.7s linear infinite;vertical-align:middle;margin-right:6px}
+@keyframes spin{to{transform:rotate(360deg)}}
+.login-outer{min-height:440px;display:flex;align-items:center;justify-content:center;padding:2rem 0}
+.login-box{width:100%;max-width:380px;margin:0 auto}
+.login-logo{display:flex;flex-direction:column;align-items:center;gap:10px;margin-bottom:2rem}
+.login-logo-icon{width:58px;height:58px;border-radius:14px;background:#1a3a5c;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 14px rgba(26,58,92,0.3)}
+.login-logo-icon svg{width:34px;height:34px}
+.login-title{font-size:18px;font-weight:600;text-align:center}
+.login-sub{font-size:13px;color:var(--color-text-secondary);text-align:center;margin-top:2px}
+.login-card{background:#fff;border:1px solid var(--color-border-tertiary);border-radius:var(--border-radius-lg);padding:1.75rem;box-shadow:0 2px 12px rgba(0,0,0,0.06)}
+.login-field{margin-bottom:15px}
+.login-field label{display:block;font-size:13px;color:var(--color-text-secondary);margin-bottom:5px;font-weight:500}
+.login-field input{width:100%;padding:10px 12px;font-size:14px;border:1px solid var(--color-border-secondary);border-radius:var(--border-radius-md);background:#fff;color:var(--color-text-primary);font-family:var(--font-sans);transition:border-color 0.15s,box-shadow 0.15s}
+.login-field input:focus{outline:none;border-color:#1a3a5c;box-shadow:0 0 0 3px rgba(26,58,92,0.1)}
+.login-field input.error{border-color:#e24b4a}
+.login-err{font-size:12px;color:#991b1b;margin-top:5px;display:none;background:#fee2e2;padding:8px 10px;border-radius:6px}
+.login-btn{width:100%;padding:12px;background:#1a3a5c;color:#fff;border:none;border-radius:var(--border-radius-md);font-size:14px;font-weight:600;cursor:pointer;font-family:var(--font-sans);margin-top:6px;transition:background 0.15s}
+.login-btn:hover{background:#15304e}
+.login-hint{font-size:12px;color:var(--color-text-secondary);text-align:center;margin-top:14px}
+.pw-wrap{position:relative}
+.pw-wrap input{padding-right:40px}
+.pw-toggle{position:absolute;right:11px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;color:var(--color-text-secondary);padding:2px;font-size:16px;line-height:1}
+.admin-badge{display:inline-flex;align-items:center;gap:5px;background:#e8f0f8;border:1px solid #93c5fd;border-radius:99px;padding:3px 10px;font-size:11px;color:#1d4ed8;font-weight:600}
+.modal-bg{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.4);z-index:1000;align-items:center;justify-content:center}
+.modal-bg.open{display:flex}
+.modal{background:#fff;border-radius:var(--border-radius-lg);padding:1.75rem;width:92%;max-width:480px;border:1px solid var(--color-border-tertiary);box-shadow:0 8px 32px rgba(0,0,0,0.15)}
+.modal h3{font-size:15px;font-weight:600;margin-bottom:.75rem;color:var(--color-text-primary)}
+.modal p{font-size:13px;color:var(--color-text-secondary);margin-bottom:10px;line-height:1.6}
+.modal-field{margin-bottom:11px}
+.modal-field label{display:block;font-size:12px;color:var(--color-text-secondary);margin-bottom:4px;font-weight:500}
+.modal-field input{width:100%;padding:8px 10px;font-size:13px;border:1px solid var(--color-border-secondary);border-radius:var(--border-radius-md);background:#fff;color:var(--color-text-primary);font-family:var(--font-sans)}
+.modal-field input:focus{outline:none;border-color:#1a3a5c;box-shadow:0 0 0 2px rgba(26,58,92,0.1)}
+.modal-actions{display:flex;gap:8px;justify-content:flex-end;margin-top:1.25rem}
+.chpw-link{font-size:12px;color:#1d4ed8;cursor:pointer;text-decoration:underline;text-underline-offset:2px;background:none;border:none;font-family:var(--font-sans)}
+
+.remarks-field{margin-top:8px}
+.remarks-field input{width:100%;padding:7px 9px;font-size:13px;border:1px solid var(--color-border-secondary);border-radius:6px;font-family:var(--font-sans)}
+.decide-btns{display:flex;gap:6px;flex-direction:column;align-items:flex-end}
+@media(max-width:600px){.row,.lt-grid{grid-template-columns:1fr}.header{flex-wrap:wrap;gap:10px}}
+</style>
+</head>
+<body>
+
+<h2 class="sr-only">SIVATATVA Solutions leave management system</h2>
+
+<div class="wrap">
+
+<!-- ═══════════════════════════════════════════════════
+     EMPLOYEE FORM PAGE
+══════════════════════════════════════════════════════ -->
+<div class="page active" id="pageEmployee">
+  <div class="header">
+    <div class="logo"><svg viewBox="0 0 26 26" fill="none"><path d="M13 3L22 8V18L13 23L4 18V8L13 3Z" stroke="#7ab3e0" stroke-width="1.5" fill="none"/><path d="M13 7L18 10V16L13 19L8 16V10L13 7Z" fill="#7ab3e0" opacity="0.5"/><circle cx="13" cy="13" r="2.5" fill="#fff"/></svg></div>
+    <div style="flex:1"><div class="page-title">Leave application</div><div class="company">SIVATATVA Solutions</div></div>
+    <button class="btn-outline" onclick="goToAdmin()" style="font-size:12px;padding:6px 14px">Admin login</button>
+  </div>
+
+  <div class="card">
+    <div class="section-label">Employee details</div>
+    <div class="field">
+      <label>Employee ID <span class="req">*</span></label>
+      <select id="empId" onchange="onEmpChange()">
+        <option value="">— select employee ID —</option>
+        <option>BE19990002</option><option>BE19990003</option><option>BE19990005</option>
+        <option>BE19990006</option><option>BE19990009</option><option>BE19990012</option>
+        <option>BE19990013</option><option>BE19990014</option><option>BE19990015</option>
+        <option>BE19990016</option><option>BE19990017</option><option>BE19990021</option>
+        <option>BE19990022</option><option>BE19990023</option><option>BE19990024</option>
+        <option>BE19990025</option><option>BE19990026</option><option>BE19990027</option>
+        <option>BE19990028</option><option>BE19990029</option><option>BE19990030</option>
+        <option>BE19990031</option><option>BE19990033</option>
+      </select>
+      <div class="emp-info" id="empInfo">
+        <div class="emp-avatar" id="empAvatar"></div>
+        <div class="emp-email-txt" id="empEmailTxt"></div>
+      </div>
+    </div>
+    <div class="row">
+      <div class="field"><label>Manager name</label><input type="text" id="managerName" placeholder="Reporting manager"></div>
+      <div class="field"><label>Manager email <span class="req">*</span></label><input type="email" id="managerEmail" placeholder="manager@sivatatva.com"></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="section-label">Leave type</div>
+    <div class="lt-grid">
+      <button class="lt-btn active" onclick="selectLeave(this,'Casual Leave')"><span class="lt-dot" style="background:#378add"></span>Casual Leave</button>
+      <button class="lt-btn" onclick="selectLeave(this,'Sick Leave')"><span class="lt-dot" style="background:#d85a30"></span>Sick Leave</button>
+      <button class="lt-btn" onclick="selectLeave(this,'Earned Leave')"><span class="lt-dot" style="background:#1d9e75"></span>Earned Leave</button>
+      <button class="lt-btn" onclick="selectLeave(this,'Emergency Leave')"><span class="lt-dot" style="background:#ba7517"></span>Emergency Leave</button>
+      <button class="lt-btn" onclick="selectLeave(this,'Maternity / Paternity')"><span class="lt-dot" style="background:#d4537e"></span>Maternity / Paternity</button>
+      <button class="lt-btn" onclick="selectLeave(this,'Unpaid Leave')"><span class="lt-dot" style="background:#888780"></span>Unpaid Leave</button>
+    </div>
+    <input type="hidden" id="leaveType" value="Casual Leave">
+  </div>
+
+  <div class="card">
+    <div class="section-label">Duration</div>
+    <div class="row">
+      <div class="field"><label>From <span class="req">*</span></label><input type="date" id="fromDate" onchange="calcDays()"></div>
+      <div class="field"><label>To <span class="req">*</span></label><input type="date" id="toDate" onchange="calcDays()"></div>
+    </div>
+    <div class="days-badge">
+      <div><div class="days-num" id="daysCount">0</div><div class="days-lbl">working days</div></div>
+      <div style="font-size:12px;color:var(--color-text-secondary)">Weekends excluded</div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="section-label">Details</div>
+    <div class="field"><label>Reason for leave <span class="req">*</span></label><textarea id="reason" placeholder="Briefly describe the reason..."></textarea></div>
+    <div class="field"><label>Work handover to</label><input type="text" id="handover" placeholder="Colleague covering during leave"></div>
+  </div>
+
+  <button class="btn-primary" id="submitBtn" style="width:100%" onclick="submitForm()">Submit application</button>
+</div>
+
+<!-- ═══════════════════════════════════════════════════
+     ADMIN LOGIN PAGE
+══════════════════════════════════════════════════════ -->
+<div class="page" id="pageLogin">
+  <div class="login-outer">
+    <div class="login-box">
+      <div class="login-logo">
+        <div class="login-logo-icon"><svg viewBox="0 0 26 26" fill="none"><path d="M13 3L22 8V18L13 23L4 18V8L13 3Z" stroke="#7ab3e0" stroke-width="1.5" fill="none"/><path d="M13 7L18 10V16L13 19L8 16V10L13 7Z" fill="#7ab3e0" opacity="0.5"/><circle cx="13" cy="13" r="2.5" fill="#fff"/></svg></div>
+        <div><div class="login-title">Admin login</div><div class="login-sub">SIVATATVA Solutions</div></div>
+      </div>
+      <div class="login-card">
+        <div class="login-field">
+          <label>Username</label>
+          <input type="text" id="loginUser" placeholder="Enter admin username" autocomplete="username" onkeydown="if(event.key==='Enter')doLogin()">
+        </div>
+        <div class="login-field">
+          <label>Password</label>
+          <div class="pw-wrap">
+            <input type="password" id="loginPass" placeholder="Enter password" autocomplete="current-password" onkeydown="if(event.key==='Enter')doLogin()">
+            <button class="pw-toggle" onclick="togglePw()" tabindex="-1">👁</button>
+          </div>
+          <div class="login-err" id="loginErr">Incorrect username or password. Please try again.</div>
+        </div>
+        <button class="login-btn" onclick="doLogin()">Sign in to admin panel</button>
+        <div class="login-hint" style="margin-top:14px">
+          <button class="chpw-link" onclick="openChangePw()">Change password</button>
+          &nbsp;·&nbsp;
+          <button class="chpw-link" onclick="showPage('pageEmployee')">Back to form</button>
+        </div>
+      </div>
+      <div style="text-align:center;margin-top:1rem;font-size:12px;color:var(--color-text-secondary)">
+        Default credentials: <strong>admin</strong> / <strong>sivatatva@2024</strong>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════
+     ADMIN PANEL PAGE
+══════════════════════════════════════════════════════ -->
+<div class="page" id="pageAdmin">
+  <div class="header">
+    <div class="logo"><svg viewBox="0 0 26 26" fill="none"><path d="M13 3L22 8V18L13 23L4 18V8L13 3Z" stroke="#7ab3e0" stroke-width="1.5" fill="none"/><path d="M13 7L18 10V16L13 19L8 16V10L13 7Z" fill="#7ab3e0" opacity="0.5"/><circle cx="13" cy="13" r="2.5" fill="#fff"/></svg></div>
+    <div style="flex:1">
+      <div style="display:flex;align-items:center;gap:8px">
+        <div class="page-title">Admin panel</div>
+        <span class="admin-badge">Admin</span>
+
+      </div>
+      <div class="company">SIVATATVA Solutions</div>
+    </div>
+    <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+
+      <button class="btn-outline" onclick="openChangePw()" style="font-size:12px;padding:6px 12px">Change password</button>
+      <button class="btn-outline" onclick="logout()" style="font-size:12px;padding:6px 12px;color:#991b1b;border-color:#fca5a5">Logout</button>
+    </div>
+  </div>
+  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem;flex-wrap:wrap;gap:8px">
+    <div class="tabs" style="margin-bottom:0;border-bottom:none">
+      <button class="tab active" onclick="filterApps('all',this)">All</button>
+      <button class="tab" onclick="filterApps('Pending',this)">Pending</button>
+      <button class="tab" onclick="filterApps('Approved',this)">Approved</button>
+      <button class="tab" onclick="filterApps('Rejected',this)">Rejected</button>
+    </div>
+    <span style="font-size:12px;color:var(--color-text-secondary)" id="appCount"></span>
+  </div>
+  <div class="card" id="appList"><div class="empty-state">No applications yet. Employees can submit from the leave form.</div></div>
+</div>
+
+
+
+<!-- ═══════════════════════════════════════════════════
+     CHANGE PASSWORD MODAL
+══════════════════════════════════════════════════════ -->
+<div class="modal-bg" id="changePwModal">
+  <div class="modal">
+    <h3>Change admin credentials</h3>
+    <div class="modal-field"><label>Current password</label><input type="password" id="curPw" placeholder="Current password"></div>
+    <div class="modal-field"><label>New username</label><input type="text" id="newUser" placeholder="New username"></div>
+    <div class="modal-field"><label>New password</label><input type="password" id="newPw" placeholder="Min 6 characters"></div>
+    <div class="modal-field"><label>Confirm new password</label><input type="password" id="confirmPw" placeholder="Repeat new password"></div>
+    <div style="font-size:12px;color:#991b1b;display:none;margin-top:6px;background:#fee2e2;padding:8px 10px;border-radius:6px" id="changePwErr"></div>
+    <div class="modal-actions">
+      <button class="btn-outline" onclick="closeChangePw()">Cancel</button>
+      <button class="btn-primary" onclick="doChangePw()">Update credentials</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════
+     REMARKS MODAL (Approve / Reject)
+══════════════════════════════════════════════════════ -->
+<div class="modal-bg" id="remarksModal">
+  <div class="modal">
+    <h3 id="remarksTitle">Add remarks (optional)</h3>
+    <p>You can add a note for the employee before finalising your decision.</p>
+    <div class="modal-field">
+      <label>Remarks / reason</label>
+      <input type="text" id="remarksInput" placeholder="e.g. Approved — enjoy your leave!">
+    </div>
+    <div class="modal-actions">
+      <button class="btn-outline" onclick="closeRemarksModal()">Cancel</button>
+      <button class="btn-primary" id="confirmDecideBtn" onclick="confirmDecide()">Confirm</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+</div><!-- end .wrap -->
+
+<script>
+// ── Data ─────────────────────────────────────────────────────
+const employees={
+  "BE19990002":"ganeshbandaru800@gmail.com","BE19990003":"sakichennakesavulu5@gmail.com",
+  "BE19990005":"umadevimenti249@gmail.com","BE19990006":"bobbychowdary4025@gmail.com",
+  "BE19990009":"ayinavarapusudha2000@gmail.com","BE19990012":"naveench9997@gmail.com",
+  "BE19990013":"faizanalishaik003@gmail.com","BE19990014":"isukapatisuchitra@gmail.com",
+  "BE19990015":"veladandipavani770@gmail.com","BE19990016":"boddapatisumasuma@gmail.com",
+  "BE19990017":"kumarswamy4545.k@gmail.com","BE19990021":"anipeddiphaneendra02@gmail.com",
+  "BE19990022":"karedlaprasad13@gmail.com","BE19990023":"raghuramkedasu2002@gmail.com",
+  "BE19990024":"bomminedihareeshbabu2@gmail.com","BE19990025":"panchadarlamurali0@gmail.com",
+  "BE19990026":"sreelakshmi0107@gmail.com","BE19990027":"kothanagaraju96@gmail.com",
+  "BE19990028":"sreekanthp98614@gmail.com","BE19990029":"srikanthch2025@gmail.com",
+  "BE19990030":"ndrnimmagadda@gmail.com","BE19990031":"lavanyabypureddy61@gmail.com",
+  "BE19990033":"dileepkumarg557@gmail.com"
+};
+
+let applications=[];
+let currentFilter='all';
+let scriptUrl='https://script.google.com/macros/s/AKfycbzcEo2XEU32o1Rczg7msk5cirHrN6_JAa9wH5filOTe-xSMJ58XKSKTIZ_AHgsz7rxb/exec';
+let isLoggedIn=false;
+let adminCreds={username:'admin',password:'sivatatva@2024'};
+let pendingDecision={appId:null,status:null};
+
+// ── Page Navigation ───────────────────────────────────────────
+function showPage(id){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  if(id==='pageAdmin')renderApps();
+}
+function goToAdmin(){
+  if(isLoggedIn){showPage('pageAdmin');}
+  else{
+    document.getElementById('loginUser').value='';
+    document.getElementById('loginPass').value='';
+    document.getElementById('loginErr').style.display='none';
+    document.getElementById('loginUser').classList.remove('error');
+    document.getElementById('loginPass').classList.remove('error');
+    showPage('pageLogin');
+    setTimeout(()=>document.getElementById('loginUser').focus(),100);
+  }
+}
+
+// ── Auth ──────────────────────────────────────────────────────
+function doLogin(){
+  const u=document.getElementById('loginUser').value.trim();
+  const p=document.getElementById('loginPass').value;
+  const err=document.getElementById('loginErr');
+  if(u===adminCreds.username&&p===adminCreds.password){
+    isLoggedIn=true;
+    err.style.display='none';
+    document.getElementById('loginUser').classList.remove('error');
+    document.getElementById('loginPass').classList.remove('error');
+    showPage('pageAdmin');
+    showToast('Welcome to admin panel','success');
+  }else{
+    err.style.display='block';
+    document.getElementById('loginUser').classList.add('error');
+    document.getElementById('loginPass').classList.add('error');
+    document.getElementById('loginPass').value='';
+    document.getElementById('loginPass').focus();
+  }
+}
+function logout(){isLoggedIn=false;showPage('pageEmployee');showToast('Logged out successfully','info');}
+function togglePw(){const i=document.getElementById('loginPass');i.type=i.type==='password'?'text':'password';}
+
+// ── Change Password ───────────────────────────────────────────
+function openChangePw(){
+  document.getElementById('changePwModal').classList.add('open');
+  document.getElementById('changePwErr').style.display='none';
+  ['curPw','newUser','newPw','confirmPw'].forEach(id=>document.getElementById(id).value='');
+}
+function closeChangePw(){document.getElementById('changePwModal').classList.remove('open');}
+function doChangePw(){
+  const cur=document.getElementById('curPw').value;
+  const newU=document.getElementById('newUser').value.trim();
+  const newP=document.getElementById('newPw').value;
+  const conf=document.getElementById('confirmPw').value;
+  const err=document.getElementById('changePwErr');
+  if(cur!==adminCreds.password){err.textContent='Current password is incorrect.';err.style.display='block';return;}
+  if(!newU){err.textContent='Username cannot be empty.';err.style.display='block';return;}
+  if(newP.length<6){err.textContent='New password must be at least 6 characters.';err.style.display='block';return;}
+  if(newP!==conf){err.textContent='Passwords do not match.';err.style.display='block';return;}
+  adminCreds={username:newU,password:newP};
+  closeChangePw();
+  showToast('Credentials updated successfully!','success');
+}
+
+// ── Employee ──────────────────────────────────────────────────
+function onEmpChange(){
+  const id=document.getElementById('empId').value;
+  const info=document.getElementById('empInfo');
+  if(id&&employees[id]){
+    document.getElementById('empAvatar').textContent=id.slice(-2).toUpperCase();
+    document.getElementById('empEmailTxt').textContent=employees[id];
+    info.style.display='flex';
+  }else info.style.display='none';
+}
+function selectLeave(btn,type){
+  document.querySelectorAll('.lt-btn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById('leaveType').value=type;
+}
+function calcDays(){
+  const from=new Date(document.getElementById('fromDate').value);
+  const to=new Date(document.getElementById('toDate').value);
+  if(isNaN(from)||isNaN(to)||to<from){document.getElementById('daysCount').textContent='0';return;}
+  let count=0,cur=new Date(from);
+  while(cur<=to){const d=cur.getDay();if(d!==0&&d!==6)count++;cur.setDate(cur.getDate()+1);}
+  document.getElementById('daysCount').textContent=count;
+}
+
+// ── Submit ────────────────────────────────────────────────────
+async function submitForm(){
+  const empId=document.getElementById('empId').value;
+  const from=document.getElementById('fromDate').value;
+  const to=document.getElementById('toDate').value;
+  const reason=document.getElementById('reason').value.trim();
+  const managerEmail=document.getElementById('managerEmail').value.trim();
+  if(!empId||!from||!to||!reason||!managerEmail){
+    showToast('Please fill all required fields','error');return;
+  }
+  const btn=document.getElementById('submitBtn');
+  btn.disabled=true;btn.innerHTML='<span class="spinner"></span>Submitting…';
+
+  const app={
+    appId:'LV'+Date.now(),
+    empId,
+    empEmail:employees[empId],
+    leaveType:document.getElementById('leaveType').value,
+    from,to,
+    days:parseInt(document.getElementById('daysCount').textContent)||0,
+    reason,
+    handover:document.getElementById('handover').value.trim()||'—',
+    managerName:document.getElementById('managerName').value.trim()||'Manager',
+    managerEmail,
+    status:'Pending',
+    submittedAt:new Date().toLocaleDateString('en-IN',{day:'2-digit',month:'short',year:'numeric'})
+  };
+
+  // Send directly to Google Sheet via GET + payload param (no CORS issues)
+  try{
+    const payload=encodeURIComponent(JSON.stringify({action:'submit',...app}));
+    const res=await fetch(scriptUrl+'?payload='+payload);
+    const result=await res.json();
+    if(result.success){
+      showToast('✓ Saved to sheet & emails sent!','success');
+    }else{
+      showToast('Sheet error: '+(result.error||result.message||'unknown'),'error');
+    }
+  }catch(err){
+    showToast('Sheet sync failed — check Apps Script URL','error');
+  }
+
+  applications.unshift(app);
+  btn.disabled=false;btn.innerHTML='Submit application'; 
+  resetForm();
+}
+
+function resetForm(){
+  document.getElementById('empId').value='';
+  document.getElementById('empInfo').style.display='none';
+  document.getElementById('managerEmail').value='';
+  document.getElementById('managerName').value='';
+  document.getElementById('fromDate').value='';
+  document.getElementById('toDate').value='';
+  document.getElementById('daysCount').textContent='0';
+  document.getElementById('reason').value='';
+  document.getElementById('handover').value='';
+  document.querySelectorAll('.lt-btn').forEach((b,i)=>b.classList.toggle('active',i===0));
+  document.getElementById('leaveType').value='Casual Leave';
+}
+
+// ── Admin Decisions ───────────────────────────────────────────
+function openRemarksModal(appId,status){
+  pendingDecision={appId,status};
+  const isApprove=status==='Approved';
+  document.getElementById('remarksTitle').textContent=isApprove?'✅ Approve application':'❌ Reject application';
+  document.getElementById('confirmDecideBtn').style.background=isApprove?'#065f46':'#991b1b';
+  document.getElementById('remarksInput').value='';
+  document.getElementById('remarksModal').classList.add('open');
+  setTimeout(()=>document.getElementById('remarksInput').focus(),100);
+}
+function closeRemarksModal(){document.getElementById('remarksModal').classList.remove('open');}
+
+async function confirmDecide(){
+  const {appId,status}=pendingDecision;
+  const remarks=document.getElementById('remarksInput').value.trim();
+  closeRemarksModal();
+
+  const app=applications.find(a=>a.appId===appId);
+  if(!app||app.status!=='Pending')return;
+  app.status=status;
+  app.remarks=remarks;
+
+  // Update sheet status + send decision email via GET
+  try{
+    const payload=encodeURIComponent(JSON.stringify({action:'decide',appId,status,remarks}));
+    const res=await fetch(scriptUrl+'?payload='+payload);
+    const result=await res.json();
+    if(result.success){
+      showToast('Application '+status+' — employee notified by email','success');
+    }else{
+      showToast(status+' saved — sheet error: '+(result.error||'unknown'),'error');
+    }
+  }catch(err){
+    showToast(status+' saved locally — sync failed','error');
+  }
+  renderApps();
+}
+
+// ── Filter & Render ───────────────────────────────────────────
+function filterApps(filter,tab){
+  currentFilter=filter;
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+  tab.classList.add('active');
+  renderApps();
+}
+function renderApps(){
+  const list=document.getElementById('appList');
+  const filtered=currentFilter==='all'?applications:applications.filter(a=>a.status===currentFilter);
+  document.getElementById('appCount').textContent=filtered.length+' application'+(filtered.length!==1?'s':'');
+  if(!filtered.length){
+    list.innerHTML='<div class="empty-state">No '+(currentFilter!=='all'?currentFilter.toLowerCase()+' ':'')+'applications yet.</div>';return;
+  }
+  list.innerHTML=filtered.map(app=>`
+    <div class="app-row">
+      <div>
+        <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
+          <span class="app-id">${app.empId}</span>
+          <span class="badge badge-${app.status.toLowerCase()}">${app.status}</span>
+          <span style="font-size:11px;color:var(--color-text-secondary)">${app.appId}</span>
+        </div>
+        <div class="app-meta">${app.leaveType} · ${app.from} → ${app.to} · ${app.days} day${app.days!==1?'s':''}</div>
+        <div class="app-meta">${app.reason}</div>
+        <div class="app-meta">Submitted ${app.submittedAt} · Handover: ${app.handover}</div>
+        <div class="app-meta">${app.empEmail} · Manager: ${app.managerName} (${app.managerEmail})</div>
+        ${app.remarks?`<div class="app-meta" style="color:#374151;font-style:italic">Remarks: ${app.remarks}</div>`:''}
+      </div>
+      <div class="decide-btns">
+        ${app.status==='Pending'?`
+          <button class="btn-approve" onclick="openRemarksModal('${app.appId}','Approved')">✅ Approve</button>
+          <button class="btn-reject" onclick="openRemarksModal('${app.appId}','Rejected')">❌ Reject</button>`:''}
+      </div>
+    </div>`).join('');
+}
+
+
+
+// ── Toast ─────────────────────────────────────────────────────
+function showToast(msg,type='info'){
+  const t=document.getElementById('toast');
+  t.className='toast '+(type||'info');
+  t.textContent=msg;t.style.display='block';
+  clearTimeout(window._tt);
+  window._tt=setTimeout(()=>t.style.display='none',3500);
+}
+
+// ── Init ──────────────────────────────────────────────────────
+const today=new Date().toISOString().split('T')[0];
+document.getElementById('fromDate').min=today;
+document.getElementById('toDate').min=today;
+
+// Close modals on backdrop click
+['changePwModal','remarksModal'].forEach(id=>{
+  document.getElementById(id).addEventListener('click',function(e){
+    if(e.target===this)this.classList.remove('open');
+  });
+});
+</script>
+</body>
+</html>
