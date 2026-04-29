@@ -141,7 +141,7 @@ body{background:#f0f4f8;font-family:var(--font-sans);color:var(--color-text-prim
         <option>BE19990022</option><option>BE19990023</option><option>BE19990024</option>
         <option>BE19990025</option><option>BE19990026</option><option>BE19990027</option>
         <option>BE19990028</option><option>BE19990029</option><option>BE19990030</option>
-        <option>BE19990031</option><option>BE19990033</option>
+        <option>BE19990031</option><option>BE19990033</option><option>BE19990034</option>
       </select>
       <div class="emp-info" id="empInfo">
         <div class="emp-avatar" id="empAvatar"></div>
@@ -161,7 +161,7 @@ body{background:#f0f4f8;font-family:var(--font-sans);color:var(--color-text-prim
       <button class="lt-btn" onclick="selectLeave(this,'Sick Leave')"><span class="lt-dot" style="background:#d85a30"></span>Sick Leave</button>
       <button class="lt-btn" onclick="selectLeave(this,'Earned Leave')"><span class="lt-dot" style="background:#1d9e75"></span>Earned Leave</button>
       <button class="lt-btn" onclick="selectLeave(this,'Emergency Leave')"><span class="lt-dot" style="background:#ba7517"></span>Emergency Leave</button>
-      <button class="lt-btn" onclick="selectLeave(this,'Maternity / Paternity')"><span class="lt-dot" style="background:#d4537e"></span>Maternity / Paternity</button>
+      <button class="lt-btn" onclick="selectLeave(this,'Half Day Leave')"><span class="lt-dot" style="background:#d4537e"></span>Half Day Leave</button>
       <button class="lt-btn" onclick="selectLeave(this,'Unpaid Leave')"><span class="lt-dot" style="background:#888780"></span>Unpaid Leave</button>
     </div>
     <input type="hidden" id="leaveType" value="Casual Leave">
@@ -219,7 +219,6 @@ body{background:#f0f4f8;font-family:var(--font-sans);color:var(--color-text-prim
         </div>
       </div>
       <div style="text-align:center;margin-top:1rem;font-size:12px;color:var(--color-text-secondary)">
-        Default credentials: <strong>admin</strong> / <strong>sivatatva@2024</strong>
       </div>
     </div>
   </div>
@@ -312,14 +311,14 @@ const employees={
   "BE19990026":"sreelakshmi0107@gmail.com","BE19990027":"kothanagaraju96@gmail.com",
   "BE19990028":"sreekanthp98614@gmail.com","BE19990029":"srikanthch2025@gmail.com",
   "BE19990030":"ndrnimmagadda@gmail.com","BE19990031":"lavanyabypureddy61@gmail.com",
-  "BE19990033":"dileepkumarg557@gmail.com"
+  "BE19990033":"dileepkumarg557@gmail.com","BE19990034":"Kokkiralabharagavi@gmail.com"
 };
 
 let applications=[];
 let currentFilter='all';
 let scriptUrl='https://script.google.com/macros/s/AKfycbzcEo2XEU32o1Rczg7msk5cirHrN6_JAa9wH5filOTe-xSMJ58XKSKTIZ_AHgsz7rxb/exec';
 let isLoggedIn=false;
-let adminCreds={username:'admin',password:'sivatatva@2024'};
+let adminCreds={username:'admin',password:'Ganesh@8630'};
 let pendingDecision={appId:null,status:null};
 
 // ── Page Navigation ───────────────────────────────────────────
